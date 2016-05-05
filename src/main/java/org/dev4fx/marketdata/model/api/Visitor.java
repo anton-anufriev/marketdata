@@ -1,4 +1,4 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.api;
 
 public interface Visitor<R, I> {
     default R visit(MarketDataNewOrder event, I input) {return null;}

@@ -1,31 +1,36 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.impl;
 
 import com.google.common.collect.ImmutableList;
+import org.dev4fx.marketdata.model.api.MarketDataEvent;
+import org.dev4fx.marketdata.model.api.MarketDataMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class MarketDataMessage implements Visitable {
+public abstract class DefaultMarketDataMessage implements MarketDataMessage {
     private final long triggerTimestamp;
     private final long eventTimestamp;
     private final List<? extends MarketDataEvent> events;
 
-    protected MarketDataMessage(final Builder messageBuilder) {
+    protected DefaultMarketDataMessage(final Builder messageBuilder) {
         this.triggerTimestamp = messageBuilder.triggerTimestamp;
         this.eventTimestamp = messageBuilder.eventTimestamp;
         this.events = messageBuilder.buildEvents();
     }
 
+    @Override
     public long getTriggerTimestamp() {
         return triggerTimestamp;
     }
 
+    @Override
     public long getEventTimestamp() {
         return eventTimestamp;
     }
 
+    @Override
     public List<? extends MarketDataEvent> getEvents() {
         return events;
     }
@@ -34,9 +39,9 @@ public abstract class MarketDataMessage implements Visitable {
         private long triggerTimestamp;
         private long eventTimestamp;
         private ImmutableList.Builder<MarketDataEvent> eventsListBuilder = ImmutableList.builder();
-        private List<MarketDataNewOrder.Builder> newOrderBuilders = new ArrayList<>();
-        private List<MarketDataReplaceOrder.Builder> replaceOrderBuilders = new ArrayList<>();
-        private List<MarketDataDeleteOrder.Builder> deleteOrderBuilders = new ArrayList<>();
+        private List<DefaultMarketDataNewOrder.Builder> newOrderBuilders = new ArrayList<>();
+        private List<DefaultMarketDataReplaceOrder.Builder> replaceOrderBuilders = new ArrayList<>();
+        private List<DefaultMarketDataDeleteOrder.Builder> deleteOrderBuilders = new ArrayList<>();
 
         public abstract T getThis();
 
@@ -68,20 +73,20 @@ public abstract class MarketDataMessage implements Visitable {
             return getThis();
         }
 
-        public MarketDataNewOrder.Builder<T> addNewOrder() {
-            final MarketDataNewOrder.Builder<T> newOrderBuilder = MarketDataNewOrder.newBuilder(getThis());
+        public DefaultMarketDataNewOrder.Builder<T> addNewOrder() {
+            final DefaultMarketDataNewOrder.Builder<T> newOrderBuilder = DefaultMarketDataNewOrder.newBuilder(getThis());
             newOrderBuilders.add(newOrderBuilder);
             return newOrderBuilder;
         }
 
-        public MarketDataReplaceOrder.Builder<T> addReplaceOrder() {
-            final MarketDataReplaceOrder.Builder<T> replaceOrderBuilder = MarketDataReplaceOrder.newBuilder(getThis());
+        public DefaultMarketDataReplaceOrder.Builder<T> addReplaceOrder() {
+            final DefaultMarketDataReplaceOrder.Builder<T> replaceOrderBuilder = DefaultMarketDataReplaceOrder.newBuilder(getThis());
             replaceOrderBuilders.add(replaceOrderBuilder);
             return replaceOrderBuilder;
         }
 
-        public MarketDataDeleteOrder.Builder<T> addDeletedOrder() {
-            final MarketDataDeleteOrder.Builder<T> deleteOrderBuilder = MarketDataDeleteOrder.newBuilder(getThis());
+        public DefaultMarketDataDeleteOrder.Builder<T> addDeletedOrder() {
+            final DefaultMarketDataDeleteOrder.Builder<T> deleteOrderBuilder = DefaultMarketDataDeleteOrder.newBuilder(getThis());
             deleteOrderBuilders.add(deleteOrderBuilder);
             return deleteOrderBuilder;
         }
@@ -104,8 +109,8 @@ public abstract class MarketDataMessage implements Visitable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MarketDataMessage)) return false;
-        MarketDataMessage that = (MarketDataMessage) o;
+        if (!(o instanceof DefaultMarketDataMessage)) return false;
+        DefaultMarketDataMessage that = (DefaultMarketDataMessage) o;
         return triggerTimestamp == that.triggerTimestamp &&
                 eventTimestamp == that.eventTimestamp &&
                 Objects.equals(events, that.events);

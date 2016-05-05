@@ -1,26 +1,31 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.impl;
+
+import org.dev4fx.marketdata.model.api.MarketDataEvent;
 
 import java.util.Objects;
 
-public abstract class MarketDataEvent implements Visitable {
+public abstract class DefaultMarketDataEvent implements MarketDataEvent {
     private final String orderId;
     private final String instrument;
     private final String market;
 
-    protected MarketDataEvent(final Builder eventBuilder) {
+    protected DefaultMarketDataEvent(final Builder eventBuilder) {
         this.orderId = eventBuilder.orderId;
         this.instrument = eventBuilder.instrument;
         this.market = eventBuilder.market;
     }
 
+    @Override
     public String getOrderId() {
         return orderId;
     }
 
+    @Override
     public String getInstrument() {
         return instrument;
     }
 
+    @Override
     public String getMarket() {
         return market;
     }
@@ -28,8 +33,8 @@ public abstract class MarketDataEvent implements Visitable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MarketDataEvent)) return false;
-        MarketDataEvent event = (MarketDataEvent) o;
+        if (!(o instanceof DefaultMarketDataEvent)) return false;
+        DefaultMarketDataEvent event = (DefaultMarketDataEvent) o;
         return Objects.equals(orderId, event.orderId) &&
                 Objects.equals(instrument, event.instrument) &&
                 Objects.equals(market, event.market);

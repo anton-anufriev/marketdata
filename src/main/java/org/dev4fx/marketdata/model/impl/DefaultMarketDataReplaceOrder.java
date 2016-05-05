@@ -1,14 +1,18 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.impl;
+
+import org.dev4fx.marketdata.model.api.MarketDataReplaceOrder;
+import org.dev4fx.marketdata.model.api.Side;
+import org.dev4fx.marketdata.model.api.Visitor;
 
 import java.util.Objects;
 
-public final class MarketDataReplaceOrder extends MarketDataEvent {
+public final class DefaultMarketDataReplaceOrder extends DefaultMarketDataEvent implements MarketDataReplaceOrder {
     private final String prevOrderId;
     private final double price;
     private final double qty;
     private final Side side;
 
-    private MarketDataReplaceOrder(final Builder builder) {
+    private DefaultMarketDataReplaceOrder(final Builder builder) {
         super(builder);
         this.prevOrderId = builder.prevOrderId;
         this.price = builder.price;
@@ -25,27 +29,32 @@ public final class MarketDataReplaceOrder extends MarketDataEvent {
     }
 
 
+    @Override
     public double getPrice() {
         return price;
     }
 
+    @Override
     public double getQty() {
         return qty;
     }
 
+    @Override
     public Side getSide() {
         return side;
     }
 
+    @Override
     public String getPrevOrderId() {
         return prevOrderId;
     }
 
+    @Override
     public <R, I> R accept(final Visitor<R, I> visitor, final I input) {
         return visitor.visit(this, input);
     }
 
-    public final static class Builder<F> extends MarketDataEvent.Builder<F, Builder<F>> {
+    public final static class Builder<F> extends DefaultMarketDataEvent.Builder<F, Builder<F>> {
         private String prevOrderId;
         private double price;
         private double qty;
@@ -100,16 +109,16 @@ public final class MarketDataReplaceOrder extends MarketDataEvent {
 
         @Override
         public MarketDataReplaceOrder build() {
-            return new MarketDataReplaceOrder(this);
+            return new DefaultMarketDataReplaceOrder(this);
         }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MarketDataReplaceOrder)) return false;
+        if (!(o instanceof DefaultMarketDataReplaceOrder)) return false;
         if (!super.equals(o)) return false;
-        MarketDataReplaceOrder that = (MarketDataReplaceOrder) o;
+        DefaultMarketDataReplaceOrder that = (DefaultMarketDataReplaceOrder) o;
         return Double.compare(that.price, price) == 0 &&
                 Double.compare(that.qty, qty) == 0 &&
                 Objects.equals(prevOrderId, that.prevOrderId) &&

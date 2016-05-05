@@ -1,8 +1,11 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.impl;
 
-public final class MarketDataDeleteOrder extends MarketDataEvent {
+import org.dev4fx.marketdata.model.api.MarketDataDeleteOrder;
+import org.dev4fx.marketdata.model.api.Visitor;
 
-    private MarketDataDeleteOrder(final Builder builder) {
+public final class DefaultMarketDataDeleteOrder extends DefaultMarketDataEvent implements MarketDataDeleteOrder {
+
+    private DefaultMarketDataDeleteOrder(final Builder builder) {
         super(builder);
     }
 
@@ -15,11 +18,12 @@ public final class MarketDataDeleteOrder extends MarketDataEvent {
     }
 
 
+    @Override
     public <R, I> R accept(final Visitor<R, I> visitor, final I input) {
         return visitor.visit(this, input);
     }
 
-    public final static class Builder<F> extends MarketDataEvent.Builder<F, Builder<F>> {
+    public final static class Builder<F> extends DefaultMarketDataEvent.Builder<F, Builder<F>> {
 
         private Builder() {
         }
@@ -34,7 +38,7 @@ public final class MarketDataDeleteOrder extends MarketDataEvent {
 
         @Override
         public MarketDataDeleteOrder build() {
-            return new MarketDataDeleteOrder(this);
+            return new DefaultMarketDataDeleteOrder(this);
         }
     }
 

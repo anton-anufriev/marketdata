@@ -1,4 +1,6 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.impl;
+
+import org.dev4fx.marketdata.model.api.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +53,7 @@ public class MarketDataSnapshotFunction implements Function<MarketDataMessage, M
     public MarketDataSnapshot apply(MarketDataMessage message) {
 
         message.accept(EVENTS_VISITOR, bookEvents);
-        return MarketDataSnapshot.newBuilder()
+        return DefaultMarketDataSnapshot.newBuilder()
                 .withEventTimestamp(System.nanoTime())
                 .withTriggerTimestamp(message.getTriggerTimestamp())
                 .withEvents(bookEvents.values())

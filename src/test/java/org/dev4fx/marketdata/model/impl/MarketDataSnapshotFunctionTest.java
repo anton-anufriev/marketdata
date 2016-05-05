@@ -1,20 +1,22 @@
-package org.dev4fx.marketdata.model;
+package org.dev4fx.marketdata.model.impl;
 
 
+import org.dev4fx.marketdata.model.api.MarketDataIncrement;
+import org.dev4fx.marketdata.model.api.MarketDataSnapshot;
+import org.dev4fx.marketdata.model.api.Side;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
 
 public class MarketDataSnapshotFunctionTest {
 
     @Test
     public void testWithEventsProvided() throws Exception {
 
-        MarketDataIncrement increment1 = MarketDataIncrement.newBuilder()
+        MarketDataIncrement increment1 = DefaultMarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(1)
                 .withEventTimestamp(2)
-                .withEvent(MarketDataNewOrder.newBuilder()
+                .withEvent(DefaultMarketDataNewOrder.newBuilder()
                         .withOrderId("1")
                         .withMarket("CNX")
                         .withInstrument("AUDUSD")
@@ -23,10 +25,10 @@ public class MarketDataSnapshotFunctionTest {
                         .withSide(Side.BID).build())
                 .build();
 
-        MarketDataIncrement increment2 = MarketDataIncrement.newBuilder()
+        MarketDataIncrement increment2 = DefaultMarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(3)
                 .withEventTimestamp(4)
-                .withEvent(MarketDataNewOrder.newBuilder()
+                .withEvent(DefaultMarketDataNewOrder.newBuilder()
                         .withOrderId("2")
                         .withMarket("CNX")
                         .withInstrument("AUDUSD")
@@ -35,10 +37,10 @@ public class MarketDataSnapshotFunctionTest {
                         .withSide(Side.ASK).build())
                 .build();
 
-        MarketDataIncrement increment3 = MarketDataIncrement.newBuilder()
+        MarketDataIncrement increment3 = DefaultMarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(5)
                 .withEventTimestamp(6)
-                .withEvent(MarketDataReplaceOrder.newBuilder()
+                .withEvent(DefaultMarketDataReplaceOrder.newBuilder()
                         .withOrderId("3")
                         .withPrevOrderId("1")
                         .withMarket("CNX")
@@ -51,10 +53,10 @@ public class MarketDataSnapshotFunctionTest {
 
         MarketDataSnapshotFunction function = new MarketDataSnapshotFunction();
         MarketDataSnapshot snapshot1 = function.apply(increment1);
-        MarketDataSnapshot expectedSnapshot1 = MarketDataSnapshot.newBuilder()
+        MarketDataSnapshot expectedSnapshot1 = DefaultMarketDataSnapshot.newBuilder()
                 .withTriggerTimestamp(1)
                 .withEventTimestamp(2)
-                .withEvent(MarketDataNewOrder.newBuilder()
+                .withEvent(DefaultMarketDataNewOrder.newBuilder()
                         .withOrderId("1")
                         .withMarket("CNX")
                         .withInstrument("AUDUSD")
@@ -68,17 +70,17 @@ public class MarketDataSnapshotFunctionTest {
 
 
         MarketDataSnapshot snapshot2 = function.apply(increment2);
-        MarketDataSnapshot expectedSnapshot2 = MarketDataSnapshot.newBuilder()
+        MarketDataSnapshot expectedSnapshot2 = DefaultMarketDataSnapshot.newBuilder()
                 .withTriggerTimestamp(3)
                 .withEventTimestamp(4)
-                .withEvent(MarketDataNewOrder.newBuilder()
+                .withEvent(DefaultMarketDataNewOrder.newBuilder()
                         .withOrderId("1")
                         .withMarket("CNX")
                         .withInstrument("AUDUSD")
                         .withPrice(1.345)
                         .withQty(1000000)
                         .withSide(Side.BID).build())
-                .withEvent(MarketDataNewOrder.newBuilder()
+                .withEvent(DefaultMarketDataNewOrder.newBuilder()
                         .withOrderId("2")
                         .withMarket("CNX")
                         .withInstrument("AUDUSD")
@@ -91,17 +93,17 @@ public class MarketDataSnapshotFunctionTest {
 
 
         MarketDataSnapshot snapshot3 = function.apply(increment3);
-        MarketDataSnapshot expectedSnapshot3 = MarketDataSnapshot.newBuilder()
+        MarketDataSnapshot expectedSnapshot3 = DefaultMarketDataSnapshot.newBuilder()
                 .withTriggerTimestamp(5)
                 .withEventTimestamp(6)
-                .withEvent(MarketDataNewOrder.newBuilder()
+                .withEvent(DefaultMarketDataNewOrder.newBuilder()
                         .withOrderId("2")
                         .withMarket("CNX")
                         .withInstrument("AUDUSD")
                         .withPrice(1.543)
                         .withQty(1000000)
                         .withSide(Side.ASK).build())
-                .withEvent(MarketDataReplaceOrder.newBuilder()
+                .withEvent(DefaultMarketDataReplaceOrder.newBuilder()
                         .withOrderId("3")
                         .withPrevOrderId("1")
                         .withMarket("CNX")
@@ -120,7 +122,7 @@ public class MarketDataSnapshotFunctionTest {
     @Test
     public void testWithNestedOrderBuilder() throws Exception {
 
-        MarketDataIncrement increment1 = MarketDataIncrement.newBuilder()
+        MarketDataIncrement increment1 = DefaultMarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(1)
                 .withEventTimestamp(2)
                 .addNewOrder()
@@ -133,7 +135,7 @@ public class MarketDataSnapshotFunctionTest {
                         .end()
                 .build();
 
-        MarketDataIncrement increment2 = MarketDataIncrement.newBuilder()
+        MarketDataIncrement increment2 = DefaultMarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(3)
                 .withEventTimestamp(4)
                 .addNewOrder()
@@ -146,7 +148,7 @@ public class MarketDataSnapshotFunctionTest {
                         .end()
                 .build();
 
-        MarketDataIncrement increment3 = MarketDataIncrement.newBuilder()
+        MarketDataIncrement increment3 = DefaultMarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(5)
                 .withEventTimestamp(6)
                 .addReplaceOrder()
@@ -163,7 +165,7 @@ public class MarketDataSnapshotFunctionTest {
 
         MarketDataSnapshotFunction function = new MarketDataSnapshotFunction();
         MarketDataSnapshot snapshot1 = function.apply(increment1);
-        MarketDataSnapshot expectedSnapshot1 = MarketDataSnapshot.newBuilder()
+        MarketDataSnapshot expectedSnapshot1 = DefaultMarketDataSnapshot.newBuilder()
                 .withTriggerTimestamp(1)
                 .withEventTimestamp(2)
                 .addNewOrder()
@@ -181,7 +183,7 @@ public class MarketDataSnapshotFunctionTest {
 
 
         MarketDataSnapshot snapshot2 = function.apply(increment2);
-        MarketDataSnapshot expectedSnapshot2 = MarketDataSnapshot.newBuilder()
+        MarketDataSnapshot expectedSnapshot2 = DefaultMarketDataSnapshot.newBuilder()
                 .withTriggerTimestamp(3)
                 .withEventTimestamp(4)
                 .addNewOrder()
@@ -206,7 +208,7 @@ public class MarketDataSnapshotFunctionTest {
 
 
         MarketDataSnapshot snapshot3 = function.apply(increment3);
-        MarketDataSnapshot expectedSnapshot3 = MarketDataSnapshot.newBuilder()
+        MarketDataSnapshot expectedSnapshot3 = DefaultMarketDataSnapshot.newBuilder()
                 .withTriggerTimestamp(5)
                 .withEventTimestamp(6)
                 .addNewOrder()
