@@ -1,9 +1,9 @@
 package org.dev4fx.marketdata.model;
 
-public interface Visitor {
-    void visit(MarketDataNewOrder event);
-    void visit(MarketDataDeleteOrder event);
-    void visit(MarketDataReplaceOrder event);
-    void visit(MarketDataIncrement message);
-    void visit(MarketDataSnapshot message);
+public interface Visitor<R, I> {
+    default R visit(MarketDataNewOrder event, I input) {return null;}
+    default R visit(MarketDataDeleteOrder event, I input) {return null;}
+    default R visit(MarketDataReplaceOrder event, I input) {return null;}
+    default R visit(MarketDataIncrement message, I input) {return null;}
+    default R visit(MarketDataSnapshot message, I input) {return null;}
 }

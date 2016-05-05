@@ -6,49 +6,55 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class MarketDataSnapshotFunction implements Function<MarketDataMessage, MarketDataSnapshot> {
-    private final Map<String, MarketDataEvent> events = new HashMap<>();
+    public static final Visitor<Map<String, MarketDataEvent>, Map<String, MarketDataEvent>> EVENTS_VISITOR = new Visitor<Map<String, MarketDataEvent>, Map<String, MarketDataEvent>>() {
+        @Override
+        public Map<String, MarketDataEvent> visit(final MarketDataNewOrder event, final Map<String, MarketDataEvent> events) {
+            MarketDataEvent existing = events.put(event.getOrderId(), event);
+            return events;
+        }
+
+        @Override
+        public Map<String, MarketDataEvent> visit(final MarketDataReplaceOrder event, final Map<String, MarketDataEvent> events) {
+            MarketDataEvent existing = events.remove(event.getPrevOrderId());
+            MarketDataEvent existingNew = events.put(event.getOrderId(), event);
+            return events;
+        }
+
+        @Override
+        public Map<String, MarketDataEvent> visit(final MarketDataDeleteOrder event, final Map<String, MarketDataEvent> events) {
+            MarketDataEvent existing = events.remove(event.getOrderId());
+            return events;
+        }
+
+        @Override
+        public Map<String, MarketDataEvent> visit(final MarketDataSnapshot message, final Map<String, MarketDataEvent> events) {
+            events.clear();
+            processEvents(message.getEvents(), events);
+            return events;
+        }
+
+        @Override
+        public Map<String, MarketDataEvent> visit(final MarketDataIncrement message, final Map<String, MarketDataEvent> events) {
+            processEvents(message.getEvents(), events);
+            return events;
+        }
+
+        private void processEvents(final List<? extends MarketDataEvent> messageEvents, final Map<String, MarketDataEvent> events) {
+            for (MarketDataEvent event : messageEvents) {
+                event.accept(this, events);
+            }
+        }
+    };
+
+    private final Map<String, MarketDataEvent> bookEvents = new HashMap<>();
 
     public MarketDataSnapshot apply(MarketDataMessage message) {
-        final Visitor eventsVisitor = new EmptyVisitor() {
-            @Override
-            public void visit(MarketDataNewOrder event) {
-                MarketDataEvent existing = events.put(event.getOrderId(), event);
-            }
 
-            @Override
-            public void visit(MarketDataReplaceOrder event) {
-                MarketDataEvent existing = events.remove(event.getPrevOrderId());
-                MarketDataEvent existingNew = events.put(event.getOrderId(), event);
-            }
-
-            @Override
-            public void visit(MarketDataDeleteOrder event) {
-                MarketDataEvent existing = events.remove(event.getOrderId());
-            }
-
-            @Override
-            public void visit(MarketDataSnapshot message) {
-                events.clear();
-                processEvents(message.getEvents());
-            }
-
-            @Override
-            public void visit(MarketDataIncrement message) {
-                processEvents(message.getEvents());
-            }
-
-            private void processEvents(final List<? extends MarketDataEvent> messageEvents) {
-                for(MarketDataEvent event : messageEvents) {
-                    event.accept(this);
-                }
-            }
-        };
-
-        message.accept(eventsVisitor);
+        message.accept(EVENTS_VISITOR, bookEvents);
         return MarketDataSnapshot.newBuilder()
                 .withEventTimestamp(System.nanoTime())
                 .withTriggerTimestamp(message.getTriggerTimestamp())
-                .withEvents(events.values())
+                .withEvents(bookEvents.values())
                 .build();
     }
 }

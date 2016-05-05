@@ -80,7 +80,7 @@ public abstract class MarketDataMessage implements Visitable {
             return replaceOrderBuilder;
         }
 
-        public MarketDataDeleteOrder.Builder<T> addDeletaOrder() {
+        public MarketDataDeleteOrder.Builder<T> addDeletedOrder() {
             final MarketDataDeleteOrder.Builder<T> deleteOrderBuilder = MarketDataDeleteOrder.newBuilder(getThis());
             deleteOrderBuilders.add(deleteOrderBuilder);
             return deleteOrderBuilder;

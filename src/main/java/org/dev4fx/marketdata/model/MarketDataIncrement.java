@@ -10,8 +10,8 @@ public class MarketDataIncrement extends MarketDataMessage {
         return new Builder();
     }
 
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
+    public <R, I> R accept(final Visitor<R, I> visitor, final I input) {
+        return visitor.visit(this, input);
     }
 
     public final static class Builder extends MarketDataMessage.Builder<Builder> {

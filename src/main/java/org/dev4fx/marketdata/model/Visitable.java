@@ -1,5 +1,5 @@
 package org.dev4fx.marketdata.model;
 
 public interface Visitable {
-    void accept(Visitor visitor);
+    <R, I> R accept(Visitor<R, I> visitor, I input);
 }

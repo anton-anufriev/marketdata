@@ -41,8 +41,8 @@ public final class MarketDataReplaceOrder extends MarketDataEvent {
         return prevOrderId;
     }
 
-    public void accept(final Visitor visitor) {
-        visitor.visit(this);
+    public <R, I> R accept(final Visitor<R, I> visitor, final I input) {
+        return visitor.visit(this, input);
     }
 
     public final static class Builder<F> extends MarketDataEvent.Builder<F, Builder<F>> {
