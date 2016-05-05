@@ -40,10 +40,15 @@ public abstract class MarketDataEvent implements Visitable {
         return Objects.hash(orderId, instrument, market);
     }
 
-    protected abstract static class Builder<T extends Builder<T>> {
+    protected abstract static class Builder<F, T extends Builder<F, T>> {
         private String orderId;
         private String instrument;
         private String market;
+        protected F fromBuilder;
+
+        public F end() {
+            return fromBuilder;
+        }
 
         public abstract T getThis();
 

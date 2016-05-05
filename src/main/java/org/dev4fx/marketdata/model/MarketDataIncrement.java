@@ -16,6 +16,9 @@ public class MarketDataIncrement extends MarketDataMessage {
 
     public final static class Builder extends MarketDataMessage.Builder<Builder> {
 
+        private Builder() {
+        }
+
         public Builder getThis() {
             return this;
         }

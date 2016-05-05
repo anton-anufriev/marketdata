@@ -14,8 +14,12 @@ public final class MarketDataNewOrder extends MarketDataEvent {
         this.side = builder.side;
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    public static <F> Builder<F> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static <F> Builder<F> newBuilder(final F fromBuilder) {
+        return new Builder<>(fromBuilder);
     }
 
 
@@ -35,28 +39,35 @@ public final class MarketDataNewOrder extends MarketDataEvent {
         visitor.visit(this);
     }
 
-    public static class Builder extends MarketDataEvent.Builder<Builder> {
+    public final static class Builder<F> extends MarketDataEvent.Builder<F, Builder<F>> {
         private double price;
         private double qty;
         private Side side;
 
-        public Builder getThis() {
+        private Builder() {
+        }
+
+        private Builder(final F fromBuilder) {
+            this.fromBuilder = fromBuilder;
+        }
+
+        public Builder<F> getThis() {
             return this;
         }
 
-        public Builder withPrice(final double price) {
+        public Builder<F> withPrice(final double price) {
             this.price = price;
-            return this;
+            return getThis();
         }
 
-        public Builder withQty(final double qty) {
+        public Builder<F> withQty(final double qty) {
             this.qty = qty;
-            return this;
+            return getThis();
         }
 
-        public Builder withSide(final Side side) {
+        public Builder<F> withSide(final Side side) {
             this.side = side;
-            return this;
+            return getThis();
         }
 
         public double getPrice() {

@@ -37,7 +37,7 @@ public class MarketDataSnapshotFunction implements Function<MarketDataMessage, M
                 processEvents(message.getEvents());
             }
 
-            private void processEvents(final List<MarketDataEvent> messageEvents) {
+            private void processEvents(final List<? extends MarketDataEvent> messageEvents) {
                 for(MarketDataEvent event : messageEvents) {
                     event.accept(this);
                 }

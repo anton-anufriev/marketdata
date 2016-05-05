@@ -9,7 +9,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class MarketDataSnapshotFunctionTest {
 
     @Test
-    public void testApply() throws Exception {
+    public void testWithEventsProvided() throws Exception {
 
         MarketDataIncrement increment1 = MarketDataIncrement.newBuilder()
                 .withTriggerTimestamp(1)
@@ -63,8 +63,7 @@ public class MarketDataSnapshotFunctionTest {
                         .withSide(Side.BID).build())
                 .build();
 
-        assertThat(snapshot1.getEvents(), equalTo(expectedSnapshot1.getEvents()));
-        assertThat(snapshot1.getTriggerTimestamp(), equalTo(expectedSnapshot1.getTriggerTimestamp()));
+        assertThat(snapshot1, MarketDataSnapshotMatcher.matches(expectedSnapshot1));
 
 
 
@@ -88,8 +87,7 @@ public class MarketDataSnapshotFunctionTest {
                         .withSide(Side.ASK).build())
                 .build();
 
-        assertThat(snapshot2.getEvents(), equalTo(expectedSnapshot2.getEvents()));
-        assertThat(snapshot2.getTriggerTimestamp(), equalTo(expectedSnapshot2.getTriggerTimestamp()));
+        assertThat(snapshot2, MarketDataSnapshotMatcher.matches(expectedSnapshot2));
 
 
         MarketDataSnapshot snapshot3 = function.apply(increment3);
@@ -113,8 +111,126 @@ public class MarketDataSnapshotFunctionTest {
                         .withSide(Side.BID).build())
                 .build();
 
-        assertThat(snapshot3.getEvents(), equalTo(expectedSnapshot3.getEvents()));
-        assertThat(snapshot3.getTriggerTimestamp(), equalTo(expectedSnapshot3.getTriggerTimestamp()));
+
+        assertThat(snapshot3, MarketDataSnapshotMatcher.matches(expectedSnapshot3));
 
     }
+
+
+    @Test
+    public void testWithNestedOrderBuilder() throws Exception {
+
+        MarketDataIncrement increment1 = MarketDataIncrement.newBuilder()
+                .withTriggerTimestamp(1)
+                .withEventTimestamp(2)
+                .addNewOrder()
+                        .withOrderId("1")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.345)
+                        .withQty(1000000)
+                        .withSide(Side.BID)
+                        .end()
+                .build();
+
+        MarketDataIncrement increment2 = MarketDataIncrement.newBuilder()
+                .withTriggerTimestamp(3)
+                .withEventTimestamp(4)
+                .addNewOrder()
+                        .withOrderId("2")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.543)
+                        .withQty(1000000)
+                        .withSide(Side.ASK)
+                        .end()
+                .build();
+
+        MarketDataIncrement increment3 = MarketDataIncrement.newBuilder()
+                .withTriggerTimestamp(5)
+                .withEventTimestamp(6)
+                .addReplaceOrder()
+                        .withOrderId("3")
+                        .withPrevOrderId("1")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.355)
+                        .withQty(1000000)
+                        .withSide(Side.BID)
+                        .end()
+                .build();
+
+
+        MarketDataSnapshotFunction function = new MarketDataSnapshotFunction();
+        MarketDataSnapshot snapshot1 = function.apply(increment1);
+        MarketDataSnapshot expectedSnapshot1 = MarketDataSnapshot.newBuilder()
+                .withTriggerTimestamp(1)
+                .withEventTimestamp(2)
+                .addNewOrder()
+                        .withOrderId("1")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.345)
+                        .withQty(1000000)
+                        .withSide(Side.BID)
+                        .end()
+                .build();
+
+        assertThat(snapshot1, MarketDataSnapshotMatcher.matches(expectedSnapshot1));
+
+
+
+        MarketDataSnapshot snapshot2 = function.apply(increment2);
+        MarketDataSnapshot expectedSnapshot2 = MarketDataSnapshot.newBuilder()
+                .withTriggerTimestamp(3)
+                .withEventTimestamp(4)
+                .addNewOrder()
+                        .withOrderId("1")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.345)
+                        .withQty(1000000)
+                        .withSide(Side.BID)
+                        .end()
+                .addNewOrder()
+                        .withOrderId("2")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.543)
+                        .withQty(1000000)
+                        .withSide(Side.ASK)
+                        .end()
+                .build();
+
+        assertThat(snapshot2, MarketDataSnapshotMatcher.matches(expectedSnapshot2));
+
+
+        MarketDataSnapshot snapshot3 = function.apply(increment3);
+        MarketDataSnapshot expectedSnapshot3 = MarketDataSnapshot.newBuilder()
+                .withTriggerTimestamp(5)
+                .withEventTimestamp(6)
+                .addNewOrder()
+                        .withOrderId("2")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.543)
+                        .withQty(1000000)
+                        .withSide(Side.ASK)
+                        .end()
+                .addReplaceOrder()
+                        .withOrderId("3")
+                        .withPrevOrderId("1")
+                        .withMarket("CNX")
+                        .withInstrument("AUDUSD")
+                        .withPrice(1.355)
+                        .withQty(1000000)
+                        .withSide(Side.BID)
+                        .end()
+                .build();
+
+
+        assertThat(snapshot3, MarketDataSnapshotMatcher.matches(expectedSnapshot3));
+
+    }
+
 }

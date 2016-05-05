@@ -16,8 +16,12 @@ public final class MarketDataReplaceOrder extends MarketDataEvent {
         this.side = builder.side;
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    public static <F> Builder<F> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static <F> Builder<F> newBuilder(final F fromBuilder) {
+        return new Builder<>(fromBuilder);
     }
 
 
@@ -41,39 +45,45 @@ public final class MarketDataReplaceOrder extends MarketDataEvent {
         visitor.visit(this);
     }
 
-    public final static class Builder extends MarketDataEvent.Builder<Builder> {
+    public final static class Builder<F> extends MarketDataEvent.Builder<F, Builder<F>> {
         private String prevOrderId;
         private double price;
         private double qty;
         private Side side;
 
-        public Builder withPrevOrderId(final String prevOrderId) {
+        private Builder() {
+        }
+
+        private Builder(final F fromBuilder) {
+            this.fromBuilder = fromBuilder;
+        }
+
+        public Builder<F> getThis() {
+            return this;
+        }
+
+        public Builder<F> withPrevOrderId(final String prevOrderId) {
             this.prevOrderId = prevOrderId;
             return this;
         }
 
-        public Builder getThis() {
-            return this;
-        }
-
-
-        public Builder withPrice(final double price) {
+        public Builder<F> withPrice(final double price) {
             this.price = price;
-            return this;
+            return getThis();
         }
 
-        public Builder withQty(final double qty) {
+        public Builder<F> withQty(final double qty) {
             this.qty = qty;
-            return this;
+            return getThis();
+        }
+
+        public Builder<F> withSide(final Side side) {
+            this.side = side;
+            return getThis();
         }
 
         public String getPrevOrderId() {
             return prevOrderId;
-        }
-
-        public Builder withSide(final Side side) {
-            this.side = side;
-            return this;
         }
 
         public double getPrice() {

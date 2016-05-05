@@ -6,13 +6,29 @@ public final class MarketDataDeleteOrder extends MarketDataEvent {
         super(builder);
     }
 
+    public static <F> Builder<F> newBuilder() {
+        return new Builder<>();
+    }
+
+    public static <F> Builder<F> newBuilder(final F fromBuilder) {
+        return new Builder<>(fromBuilder);
+    }
+
+
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 
-    public final static class Builder extends MarketDataEvent.Builder<Builder> {
+    public final static class Builder<F> extends MarketDataEvent.Builder<F, Builder<F>> {
 
-        public Builder getThis() {
+        private Builder() {
+        }
+
+        private Builder(final F fromBuilder) {
+            this.fromBuilder = fromBuilder;
+        }
+
+        public Builder<F> getThis() {
             return this;
         }
 
